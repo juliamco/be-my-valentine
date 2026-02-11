@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 const App = () => {
   const [accepted, setAccepted] = useState<boolean>(false);
   const [selectedIdeas, setSelectedIdeas] = useState<string[]>([]);
+  const [otherIdea, setOtherIdea] = useState("");
+  const [selectOtherIdea, setSelectOtherIdea] = useState(false);
   const noButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const ideas: string[] = [
@@ -54,21 +56,18 @@ const App = () => {
 
   const sendEmail = (): void => {
     const subject = "YES! ❤️";
-    const body = `I'm so excited for our Valentine's date!\n\nHere are my ideas:\n\n${selectedIdeas.join(
-      "\n",
-    )}`;
+    const otherIdeaText = selectOtherIdea ? `\n${otherIdea}` : "";
+    const body = `I'm so excited for our Valentine's date!\n\nHere are my ideas:\n\n${selectedIdeas.join("\n")}${otherIdeaText}`;
 
-    window.location.href = `mailto:?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-300 to-rose-200">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl text-center w-[380px] relative">
+      <div className="bg-white p-10 rounded-3xl shadow-2xl text-center lg:w-[380px] relative">
         {!accepted ? (
-          <>
-            <h1 className="text-3xl font-bold text-pink-600 mb-8">
+          <div className="flex flex-col gap-8">
+            <h1 className="text-3xl font-bold text-pink-600">
               Be my valentine? 💖
             </h1>
 
@@ -87,11 +86,13 @@ const App = () => {
                 No
               </button>
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <h1 className="text-3xl font-bold text-pink-600 mb-6">Yay!! ❤️</h1>
-
+          <div className="flex flex-col gap-3">
+            <h1 className="text-3xl font-bold text-pink-600">Yay!! ❤️</h1>
+            <p className="text-sm font-light text-pink-600">
+              What should we do?
+            </p>
             <div className="flex flex-col text-left gap-3">
               {ideas.map((idea) => (
                 <label
@@ -106,16 +107,30 @@ const App = () => {
                   {idea}
                 </label>
               ))}
+              <div className="flex gap-3">
+                <input
+                  type="checkbox"
+                  className="accent-pink-600"
+                  onChange={() => setSelectOtherIdea(!selectOtherIdea)}
+                />
+                <span>Other:</span>
+                <input
+                  type="text"
+                  className="accent-pink-600 border-b"
+                  value={otherIdea}
+                  onChange={(e) => setOtherIdea(e.target.value)}
+                />
+              </div>
             </div>
 
             <button
               onClick={sendEmail}
-              disabled={selectedIdeas.length === 0}
+              disabled={selectedIdeas.length === 0 && !selectOtherIdea}
               className="mt-6 px-6 py-2 rounded-full bg-green-500 text-white font-medium hover:bg-green-600 disabled:bg-gray-400 transition"
             >
               Send My Answer 💌
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>
